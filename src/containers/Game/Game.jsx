@@ -73,26 +73,25 @@ class Game extends Component {
         }
         if (!this.state.playgroundDeck.length) {
             this.firstClickPlayerTileHandler(newPlayerDeck, event.target.id, index);
+            this.setPossibleChoices(event.target.id);
         } else {
             this.setPossibleChoices(event.target.id);
             this.setState({ selectedTile: event.target.id });
-           console.log(this.state.setPossibleChoices);
+            console.log(this.state.setPossibleChoices);
         }
     }
 
     firstClickPlayerTileHandler = (playerDeck, id, index) => {
         let newPlayerDeck = [...playerDeck];
-        const xPos = 550;
+        const xPos = 500;
         const yPos = 300;
-        const newPlaygroundDeck = [
-            {
-                name: id,
-                xPos: xPos,
-                yPos: yPos,
-                classes: "Horizontal"
-            }
-        ];
-        
+        const newPlaygroundDeck = [{
+            name: id,
+            xPos: xPos,
+            yPos: yPos,
+            classes: "Horizontal"
+        }];
+
         let newPlayerValues = [];
         for (let i = 0; i < newPlayerDeck.length; i++) {
             let tile = newPlayerDeck[i];
@@ -113,14 +112,12 @@ class Game extends Component {
             name: id.charAt(0),
             xPos: xPos,
             yPos: yPos,
-            classes: "Horizontal",
             direction: "left"
         };
         let tileEnd2 = {
             name: id.charAt(1),
             xPos: xPos + 80,
             yPos: yPos,
-            classes: "Horizontal",
             direction: "right"
         };
         newEnds.push(tileEnd1, tileEnd2);
@@ -128,15 +125,13 @@ class Game extends Component {
             let tileEnd3 = {
                 name: id.charAt(0),
                 xPos: xPos + 20,
-                yPos: yPos ,
-                classes: "Vertical",
+                yPos: yPos,
                 direction: "up"
             };
             let tileEnd4 = {
                 name: id.charAt(0),
                 xPos: xPos + 20,
                 yPos: yPos + 40,
-                classes: "Vertical",
                 direction: "down"
             };
             newEnds.push(tileEnd3, tileEnd4);
@@ -146,7 +141,7 @@ class Game extends Component {
         this.setState({
             playgroundDeck: newPlaygroundDeck,
             playerDeck: newPlayerDeck,
-            score:  newScore,
+            score: newScore,
             playerValues: newPlayerValues,
             ends: newEnds
         });
@@ -156,40 +151,47 @@ class Game extends Component {
         const ends = [...this.state.ends];
         let firstNum = selectedTile.charAt(0);
         let secondNum = selectedTile.charAt(1);
+        let newPossibleChoices = [];
+        let tmpArray = [];
+        /******************************/
         for (let i = 0; i < ends.length; i++) {
-            if (ends[i].name === firstNum && ends[i].name === secondNum) {//mm,nn
-                if (ends[i].classes === "Horizontal" || ends[i].classes === "HorizontalInverted") {
-                    this.addToHorizontalTileDouble(ends[i]);
+            if (ends[i].name === firstNum && ends[i].name === secondNum) {    //mm,nn
+                if (ends[i].direction === "right" || ends[i].direction === "left") {
+                    tmpArray = this.addToHorizontalTileDouble(ends[i], selectedTile);
                 }
-                else if (ends[i].classes === "Vertical" || ends[i].classes === "VerticalInverted") {
-                    this.addToVerticalTileDouble(ends[i]);
+                else if (ends[i].direction === "up" || ends[i].direction === "down") {
+                    tmpArray = this.addToVerticalTileDouble(ends[i], selectedTile);
                 }
                 else { console.log("Error!"); }
+                newPossibleChoices = newPossibleChoices.concat(tmpArray);
             }
             else if (ends[i].name === firstNum) {  //m* , n*
-                if (ends[i].classes === "Horizontal" || ends[i].classes === "HorizontalInverted") {
-                    this.addToHorizontalTile_1(ends[i]);
+                if (ends[i].direction === "right" || ends[i].direction === "left") {
+                    tmpArray = this.addToHorizontalTile_1(ends[i], selectedTile);
                 }
-                else if (ends[i].classes === "Vertical"  || ends[i].classes === "VerticalInverted") {
-                    this.addToVerticalTile_1(ends[i]);
+                else if (ends[i].direction === "up" || ends[i].direction === "down") {
+                    tmpArray = this.addToVerticalTile_1(ends[i], selectedTile);
                 }
                 else { console.log("Error!"); }
+                newPossibleChoices = newPossibleChoices.concat(tmpArray);
             }
             else if (ends[i].name === secondNum) { //*m, *n
-                if (ends[i].classes === "Horizontal" || ends[i].classes === "HorizontalInverted") {
-                    this.addToHorizontalTile_2(ends[i]);
+                if (ends[i].direction === "right" || ends[i].direction === "left") {
+                    tmpArray = this.addToHorizontalTile_2(ends[i], selectedTile);
                 }
-                else if (ends[i].classes === "Vertical"  || ends[i].classes === "VerticalInverted") {
-                    this.addToVerticalTile_2(ends[i]);
+                else if (ends[i].direction === "up" || ends[i].direction === "down") {
+                    tmpArray = this.addToVerticalTile_2(ends[i], selectedTile);
                 }
                 else { console.log("Error!"); }
+                newPossibleChoices = newPossibleChoices.concat(tmpArray);
             }
             else { }
         }
 
+        this.setState({ possibleChoices: newPossibleChoices });
     }
 
-    addToVerticalTile_1 = (end) => { //m*, n* 
+    addToVerticalTile_1 = (end, name) => { //m*, n* 
         let xPos = end.xPos;
         let yPos;
         let classes;
@@ -204,23 +206,18 @@ class Game extends Component {
             direction = "down";
             classes = "Vertical";
         }
-        let newPossibleChoices = [
-            ...this.state.possibleChoices,
-            {
-                name : end.name,
-                xPos: xPos,
-                yPos: yPos,
-                classes: classes,
-                direction: direction
-            }
-        ];
+        let newPossibleChoices = [{
+            name: name,
+            xPos: xPos,
+            yPos: yPos,
+            classes: classes,
+            direction: direction
+        }];
 
-        this.setState({
-            possibleChoices : newPossibleChoices
-        });
+        return newPossibleChoices;
     }
 
-    addToVerticalTile_2 = (end) => { //*m, *n
+    addToVerticalTile_2 = (end, name) => { //*m, *n
         let xPos = end.xPos;
         let yPos;
         let classes;
@@ -237,23 +234,18 @@ class Game extends Component {
             classes = "VerticalInverted";
         }
 
-        let newPossibleChoices = [
-            ...this.state.possibleChoices,
-            {
-                name : end.name,
-                xPos: xPos,
-                yPos: yPos,
-                classes: classes,
-                direction: direction
-            }
-        ];
+        let newPossibleChoices = [{
+            name: name,
+            xPos: xPos,
+            yPos: yPos,
+            classes: classes,
+            direction: direction
+        }];
 
-        this.setState({
-            possibleChoices : newPossibleChoices
-        });
+        return newPossibleChoices;
     }
 
-    addToHorizontalTile_1 = (end) => { //m*, n*
+    addToHorizontalTile_1 = (end, name) => { //m*, n*
         let xPos;
         let yPos = end.yPos;
         let classes;
@@ -270,23 +262,18 @@ class Game extends Component {
             classes = "Horizontal";
         }
 
-        let newPossibleChoices = [
-            ...this.state.possibleChoices,
-            {
-                name : end.name,
-                xPos: xPos,
-                yPos: yPos,
-                classes: classes,
-                direction: direction
-            }
-        ];
+        let newPossibleChoices = [{
+            name: name,
+            xPos: xPos,
+            yPos: yPos,
+            classes: classes,
+            direction: direction
+        }];
 
-        this.setState({
-            possibleChoices : newPossibleChoices
-        });
+        return newPossibleChoices;
     }
 
-    addToHorizontalTile_2 = (end) => { //*m, *n
+    addToHorizontalTile_2 = (end, name) => { //*m, *n
         let xPos;
         let yPos = end.yPos;
         let classes;
@@ -303,75 +290,64 @@ class Game extends Component {
             classes = "HorizontalInverted";
         }
 
-        let newPossibleChoices = [
-            ...this.state.possibleChoices,
-            {
-                name : end.name,
-                xPos: xPos,
-                yPos: yPos,
-                classes: classes,
-                direction: direction
-            }
-        ];
+        let newPossibleChoices = [{
+            name: name,
+            xPos: xPos,
+            yPos: yPos,
+            classes: classes,
+            direction: direction
+        }];
 
-        this.setState({
-            possibleChoices : newPossibleChoices
-        });
+        return newPossibleChoices;
     }
 
-    addToVerticalTileDouble = (end) => { //mm, nn   //todo 
+    addToVerticalTileDouble = (end, name) => { //mm, nn    
         let xPos = end.xPos - 20;
         let yPos;
         let classes = "Horizontal";
-       // let direction;
-        if(end.direction === "up"){
+        let direction;
+        if (end.direction === "up") {
             yPos = end.yPos - 40;
+            direction = "left right up"
         }
-        else{
+        else {
             yPos = end.yPos;
+            direction = "left right down"
         }
-        let newPossibleChoices = [
-            ...this.state.possibleChoices,
-            {
-                name : end.name,
-                xPos: xPos,
-                yPos: yPos,
-                classes: classes,
-              //  direction: direction
-            }
-        ];
+        let newPossibleChoices = [{
+            name: name,
+            xPos: xPos,
+            yPos: yPos,
+            classes: classes,
+            direction: direction
+        }];
 
-        this.setState({
-            possibleChoices : newPossibleChoices
-        });
+        return newPossibleChoices;
     }
 
-    addToHorizontalTileDouble = (end) => { //mm, nn   //todo 
+    addToHorizontalTileDouble = (end, name) => { //mm, nn    
         let xPos;
         let yPos = end.yPos - 20;
         let classes = "Vertical";
-      //  let direction;
+        let direction;
 
-        if(end.direction === "left"){ //mm
+        if (end.direction === "left") { //mm
             xPos = end.xPos - 40;
+            direction = "left up down";
         }
         else {                        //nn
             xPos = end.xPos;
-        } 
-        let newPossibleChoices = [
-            ...this.state.possibleChoices,
-            {
-                name : end.name,
-                xPos: xPos,
-                yPos: yPos,
-                classes: classes,
-           //     direction: direction
-            }
-        ];
+            direction = "right up down";
+        }
+        let newPossibleChoices = [{
+            name: name,
+            xPos: xPos,
+            yPos: yPos,
+            classes: classes,
+            direction: direction
+        }];
 
-        this.setState({
-            possibleChoices : newPossibleChoices
-        });
+        return newPossibleChoices;
     }
 
     updateIfCanPullFromDeck = (playerValues, ends) => {
@@ -451,6 +427,10 @@ class Game extends Component {
         this.setState({ states: newStates });
     }
 
+    placeHolderClickHandler = () => {
+        alert("placeholder clicked");
+    }
+
     render() {
         return (
             <Fragment>
@@ -462,7 +442,8 @@ class Game extends Component {
                     score={this.state.score} />
                 <Playground
                     board={this.state.playgroundDeck}
-                    placeHolders={this.state.possibleChoices} />
+                    possibleChoices={this.state.possibleChoices}
+                    click={this.placeHolderClickHandler} />
                 <Deck
                     isEmpty={this.state.deck.length > 0 ? false : true}
                     clicked={this.clickDeckHandler} />

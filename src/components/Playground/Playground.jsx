@@ -6,7 +6,8 @@ const playground = (props) => (
     <div className="Playground" >
         <Board
             board={props.board}
-            placeHolders={props.placeHolders}
+            possibleChoices={props.possibleChoices}
+            click={props.click}
         />
     </div>
 );

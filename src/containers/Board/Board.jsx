@@ -1,25 +1,40 @@
 import React from 'react';
 import './Board.css';
 import Tile from '../../components/Tile/Tile';
+import Placeholder from '../../components/Placeholder/Placeholder';
 
 const board = (props) => {
-    let array = [...props.board];
+    let board = [...props.board];
     let tiles = [];
-    let placeHolders = [...props.placeHolders];
-    console.log(placeHolders);
-    for (let i = 0; i < array.length; i++) {
+    let possibleChoices = [...props.possibleChoices];
+    let choices = [];
+
+    for (let i = 0; i < board.length; i++) {
         tiles[i] = 
             <Tile
-                key={array[i].name}
-                tileName={array[i].name}  
-                xPos={array[i].xPos}
-                yPos={array[i].yPos}
-                classes={array[i].classes}
+                key={board[i].name}
+                tileName={board[i].name}  
+                xPos={board[i].xPos}
+                yPos={board[i].yPos}
+                classes={board[i].classes}
+            />;
+    }
+
+    for (let i = 0; i < possibleChoices.length; i++) {
+        let key = possibleChoices[i].name + "" + i;
+        choices[i] = 
+            <Placeholder
+                key={key} 
+                xPos={possibleChoices[i].xPos}
+                yPos={possibleChoices[i].yPos}
+                classes={possibleChoices[i].classes}
+                click={props.click}
             />;
     }
     return (
         <div className="Board" >
             {tiles}
+            {choices}
         </div>
     );
 }

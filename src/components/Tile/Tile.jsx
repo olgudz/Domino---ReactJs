@@ -127,7 +127,7 @@ const tile = (props) => {
   let styles;
   if (props.classes !== undefined) {
     styles = {
-      position: "relative",
+      position: "absolute",
       left: props.xPos,
       top: props.yPos
     };
@@ -141,8 +141,8 @@ const tile = (props) => {
         style={styles}
         alt="tile"
         onClick={props.click}
-      />)
-
+      />
+    );
 };
 
 export default tile;
