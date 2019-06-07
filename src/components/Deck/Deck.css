@@ -1,0 +1,38 @@
+.Deck {
+    background-color: #ccc;
+    margin-top: 70px;
+    width: 10%;
+    float: right;
+    height: calc(100vh - 210px);
+    box-sizing: border-box; 
+}
+
+.Deck img{
+    display: block;
+    margin: auto; 
+    margin-top: 250px;
+}
+
+@media (min-height: 200px) {
+    .Deck img{
+        margin-top: 80px;
+    }
+}
+
+@media (min-height: 401px) {
+    .Deck img{
+        margin-top: 100px;
+    }
+}
+
+@media  (min-height: 600px) {
+    .Deck img {
+        margin-top: 160px;
+    }
+}
+
+@media  (min-height: 800px) {
+    .Deck img {
+        margin-top: 200px;
+    }
+}

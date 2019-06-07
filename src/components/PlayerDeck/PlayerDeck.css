@@ -1,0 +1,17 @@
+.PlayerDeck {
+    height: 140px;
+    background-color: #703b09;
+    display: flex;
+    justify-content: center; 
+    box-sizing: border-box;
+    z-index: 90;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    overflow: auto;
+  }
+
+ .PlayerDeck img{
+   margin: 10px;
+ }

@@ -1,0 +1,8 @@
+.Statistic {
+    margin-top: 70px;
+    display: inline-block;
+    width: 20%;
+    height: calc(100vh - 210px);
+    background: #ccc;
+    box-sizing: border-box;
+  }

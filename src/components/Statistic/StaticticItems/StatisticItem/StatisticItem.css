@@ -1,0 +1,10 @@
+.StatisticItem{
+    box-sizing: border-box;
+    list-style: none;
+    float: left;
+    width: 80%;  
+    padding: 20px 10px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: left;
+}

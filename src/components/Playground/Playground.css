@@ -1,0 +1,11 @@
+.Playground {
+    position: absolute;
+    width: 70%;
+    margin: auto;
+    margin-top: 70px;
+    height: calc(100vh - 210px);
+    overflow: auto;
+    display: inline-block;
+    box-sizing: border-box;
+    background-image: url("http://bgfons.com/uploads/wood/wood%20_texture3196.jpg");
+}
