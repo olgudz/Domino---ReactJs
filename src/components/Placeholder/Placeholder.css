@@ -1,0 +1,22 @@
+.Placeholder{
+    width: 40px;
+    height: 80px;
+    border: 1px solid red;
+    box-sizing: border-box;
+}
+
+.Vertical{
+
+}
+
+.Horizontal{
+    transform: rotate(270deg) translateX(20px) translateY(20px);
+} 
+
+.VerticalInverted{
+    transform: rotate(180deg);
+}
+
+.HorizontalInverted{   
+    transform: rotate(90deg) translateX(-20px) translateY(-20px);
+}
