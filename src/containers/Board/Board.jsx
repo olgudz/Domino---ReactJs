@@ -19,12 +19,12 @@ const board = (props) => {
                 classes={board[i].classes}
             />;
     }
-
+    
     for (let i = 0; i < possibleChoices.length; i++) {
-        let key = possibleChoices[i].name + "" + i;
         choices[i] = 
             <Placeholder
-                key={key} 
+                key={possibleChoices[i].name + "" + possibleChoices[i].direction} 
+                name = {possibleChoices[i].name}
                 xPos={possibleChoices[i].xPos}
                 yPos={possibleChoices[i].yPos}
                 classes={possibleChoices[i].classes}

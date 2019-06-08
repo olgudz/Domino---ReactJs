@@ -10,10 +10,9 @@ const placeholder = (props) => {
         left: props.xPos,
         top: props.yPos
     };
-    console.log("key " + props.key);
     return (
         <div
-          key={props.key}
+          name={props.name}
           className={classesString}
           style={styles}
           onClick={props.click}></div>
@@ -21,8 +20,3 @@ const placeholder = (props) => {
 };
 
 export default placeholder;
-
-/************** 
-left: props.xPos,
-top: props.yPos 
-********** */

@@ -77,7 +77,6 @@ class Game extends Component {
         } else {
             this.setPossibleChoices(event.target.id);
             this.setState({ selectedTile: event.target.id });
-            console.log(this.state.setPossibleChoices);
         }
     }
 
@@ -92,18 +91,9 @@ class Game extends Component {
             classes: "Horizontal"
         }];
 
-        let newPlayerValues = [];
-        for (let i = 0; i < newPlayerDeck.length; i++) {
-            let tile = newPlayerDeck[i];
-            let num = tile.charAt(0)
-            newPlayerValues.push(num);
-            num = tile.charAt(1)
-            newPlayerValues.push(num);
-        }
-        let newScore = 0;
-        for (let i = 0; i < newPlayerValues.length; i++) {
-            newScore += Number(newPlayerValues[i]);
-        }
+        let newPlayerValues = this.setPlayerValues(newPlayerDeck);
+
+        let newScore = this.setScore(newPlayerValues);
 
         newPlayerDeck.splice(index, 1);
 
@@ -136,7 +126,6 @@ class Game extends Component {
             };
             newEnds.push(tileEnd3, tileEnd4);
         }
-        this.updateIfCanPullFromDeck(newPlayerValues, [newEnds[0].name, newEnds[1].name]);
 
         this.setState({
             playgroundDeck: newPlaygroundDeck,
@@ -147,13 +136,32 @@ class Game extends Component {
         });
     }
 
+    setPlayerValues = (newPlayerDeck) => {
+        let newPlayerValues = [];
+        for (let i = 0; i < newPlayerDeck.length; i++) {
+            let tile = newPlayerDeck[i];
+            let num = tile.charAt(0)
+            newPlayerValues.push(num);
+            num = tile.charAt(1)
+            newPlayerValues.push(num);
+        }
+        return newPlayerValues;
+    }
+
+    setScore = (newPlayerValues) => {
+        let newScore = 0;
+        for (let i = 0; i < newPlayerValues.length; i++) {
+            newScore += Number(newPlayerValues[i]);
+        }
+        return newScore;
+    }
+
     setPossibleChoices = (selectedTile) => {
         const ends = [...this.state.ends];
         let firstNum = selectedTile.charAt(0);
         let secondNum = selectedTile.charAt(1);
         let newPossibleChoices = [];
         let tmpArray = [];
-        /******************************/
         for (let i = 0; i < ends.length; i++) {
             if (ends[i].name === firstNum && ends[i].name === secondNum) {    //mm,nn
                 if (ends[i].direction === "right" || ends[i].direction === "left") {
@@ -187,6 +195,8 @@ class Game extends Component {
             }
             else { }
         }
+
+        
 
         this.setState({ possibleChoices: newPossibleChoices });
     }
@@ -350,17 +360,13 @@ class Game extends Component {
         return newPossibleChoices;
     }
 
-    updateIfCanPullFromDeck = (playerValues, ends) => {
-        if (ends.length === 0) {
-            ends = [...this.state.ends];
-        }
-        if (playerValues.length === 0) {
-            playerValues = [...this.state.playerValues];
-        }
+    updateIfCanPullFromDeck = () => {
+        let ends = [...this.state.ends];
+        let playerValues = [...this.state.playerValues];
         let result = true;
         for (let i = 0; i < playerValues.length; i++) {
             for (let j = 0; j < ends.length; j++) {
-                if (playerValues[i] === ends[j]) {
+                if (playerValues[i] === ends[j].name) {
                     result = false;
                     break;
                 }
@@ -374,6 +380,7 @@ class Game extends Component {
         setInterval(() => {
             this.setState((prevState) => ({ time: prevState.time + 1 }));
         }, 1000);
+        setInterval( () => this.updateIfCanPullFromDeck() , 1000);
     }
 
     createGame = () => {
@@ -427,8 +434,87 @@ class Game extends Component {
         this.setState({ states: newStates });
     }
 
-    placeHolderClickHandler = () => {
-        alert("placeholder clicked");
+    placeHolderClickHandler = (event) => {
+        let newPlayerDeck = [...this.state.playerDeck];
+        let newEnds = [...this.state.ends]; 
+        let newPlaygroundDeck = [...this.state.playgroundDeck];
+
+        let xPos = event.target.style.left;
+        let yPos = event.target.style.top;
+        let classes = this.firstWordOfString(event.target.className);
+
+        let newAddedTile = {
+            name : this.state.selectedTile,
+            xPos: xPos,
+            yPos: yPos,
+            classes : classes
+        }
+        newPlaygroundDeck.push(newAddedTile);
+        let index;
+        for (let i = 0; i < newPlayerDeck.length; i++) {
+            if (newPlayerDeck[i] === this.state.selectedTile) {
+                index = i;
+                break;
+            }
+        }
+        newPlayerDeck.splice(index, 1);
+        let newPlayerValues = this.setPlayerValues(newPlayerDeck);
+        let newScore = this.setScore(newPlayerValues);
+
+///updateEnds
+        for(let i = 0; i < newEnds.length; i++){
+            if((newEnds[i].yPos === (yPos + 80)) && (newEnds[i].xPos === xPos)){
+                newEnds = this.setEndUpSingle(xPos, yPos);
+            }
+            else if((newEnds[i].xPos === (xPos + 80)) && (newEnds[i].yPos === yPos)){
+                newEnds = this.setEndLeftSingle(xPos, yPos);
+            }
+            else if((newEnds[i].xPos === (xPos + 20)) && (newEnds[i].yPos === (yPos+40))){
+                newEnds = this.setEndUpDouble(xPos, yPos);
+            }
+            else if((newEnds[i].xPos === (xPos + 20)) && (newEnds[i].yPos === yPos)){
+                newEnds = this.setEndDownDouble(xPos, yPos);
+            }
+            else if((newEnds[i].xPos === (xPos + 40)) && (newEnds[i].yPos === (yPos+20))){
+                newEnds = this.setEndLeftDouble(xPos, yPos);
+            }
+            else if((newEnds[i].xPos === xPos) && (newEnds[i].yPos === (yPos+20))){
+                newEnds = this.setEndRightDouble(xPos, yPos);
+            }
+            else if((newEnds[i].yPos === yPos ) && (newEnds[i].xPos === xPos)){
+                if(newEnds[i].direction === "down"){
+                    newEnds = this.setEndDownSingle(xPos, yPos);
+                }
+                else if (newEnds[i].direction === "right"){
+                    newEnds = this.setEndRightSingle(xPos, yPos);
+                }
+            }
+        }
+
+        this.setState((prevState, props) => ({
+            possibleChoices: [],
+            playgroundDeck : newPlaygroundDeck,
+            turns : prevState.turns + 1,
+            playerDeck : newPlayerDeck,
+            end:newEnds,
+            playerValues : newPlayerValues,
+            score : newScore,
+            selectedTile : ""
+        }));
+    }
+
+    setEndUpSingle = () => {}
+    setEndDownSingle = () => {}
+    setEndRightSingle = () => {}
+    setEndLeftSingle = () => {}
+    setEndUpDouble = () => {}
+    setEndDownDouble = () => {}
+    setEndRightDouble = () => {}
+    setEndLeftDouble = () => {}
+    firstWordOfString = (str) => {
+        let index = str.indexOf(" ");
+        let firstWord = str.substring(0, index);
+        return firstWord;
     }
 
     render() {
