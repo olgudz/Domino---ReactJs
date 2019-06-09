@@ -90,14 +90,14 @@ class Game extends Component {
 
         let newEnds = [];
 
-        let tileEnd1 = {
+        const tileEnd1 = {
             name: id.charAt(0),
             xPos: xPos,
             yPos: yPos,
             direction: "left"
         };
 
-        let tileEnd2 = {
+        const tileEnd2 = {
             name: id.charAt(1),
             xPos: xPos + 80,
             yPos: yPos,
@@ -106,13 +106,14 @@ class Game extends Component {
 
         newEnds.push(tileEnd1, tileEnd2);
         if (tileEnd1.name === tileEnd2.name) {
-            let tileEnd3 = {
+            const tileEnd3 = {
                 name: id.charAt(0),
                 xPos: xPos + 20,
                 yPos: yPos,
                 direction: "up"
             };
-            let tileEnd4 = {
+
+            const tileEnd4 = {
                 name: id.charAt(0),
                 xPos: xPos + 20,
                 yPos: yPos + 40,
@@ -463,36 +464,36 @@ class Game extends Component {
         ///updateEnds
         for (let i = 0; i < newEnds.length; i++) {
             if ((Number(newEnds[i].yPos) === (yPos + 80)) && (Number(newEnds[i].xPos) === xPos)) {
-                newEnds = this.setEndUpSingle(xPos, yPos, i);
+                this.setEndUpSingle(xPos, yPos, i);
                 break;
             }
             else if ((Number(newEnds[i].xPos) === (xPos + 80)) && (Number(newEnds[i].yPos) === yPos)) {
-                newEnds = this.setEndLeftSingle(xPos, yPos, i);
+                this.setEndLeftSingle(xPos, yPos, i);
                 break;
             }
             else if ((Number(newEnds[i].xPos) === (xPos + 20)) && (Number(newEnds[i].yPos) === (yPos + 40))) {
-                newEnds = this.setEndUpDouble(xPos, yPos, i);
+                this.setEndUpDouble(xPos, yPos, i);
                 break;
             }
             else if ((Number(newEnds[i].xPos) === (xPos + 20)) && (Number(newEnds[i].yPos) === yPos)) {
-                newEnds = this.setEndDownDouble(xPos, yPos, i);
+                this.setEndDownDouble(xPos, yPos, i);
                 break;
             }
             else if ((Number(newEnds[i].xPos) === (xPos + 40)) && (Number(newEnds[i].yPos) === (yPos + 20))) {
-                newEnds = this.setEndLeftDouble(xPos, yPos, i);
+                this.setEndLeftDouble(xPos, yPos, i);
                 break;
             }
             else if ((Number(newEnds[i].xPos) === xPos) && (Number(newEnds[i].yPos) === (yPos + 20))) {
-                newEnds = this.setEndRightDouble(xPos, yPos, i);
+                this.setEndRightDouble(xPos, yPos, i);
                 break;
             }
             else if ((Number(newEnds[i].yPos) === yPos) && (Number(newEnds[i].xPos) === xPos)) {
                 if (newEnds[i].direction === "down") {
-                    newEnds = this.setEndDownSingle(xPos, yPos, i);
+                    this.setEndDownSingle(xPos, yPos, i);
                     break;
                 }
                 else if (newEnds[i].direction === "right") {
-                    newEnds = this.setEndRightSingle(xPos, yPos, i);
+                    this.setEndRightSingle(xPos, yPos, i);
                     break;
                 }
             }
@@ -503,7 +504,6 @@ class Game extends Component {
             playgroundDeck: newPlaygroundDeck,
             turns: prevState.turns + 1,
             playerDeck: newPlayerDeck,
-            end: newEnds,
             playerValues: newPlayerValues,
             score: newScore,
             selectedTile: ""
@@ -517,7 +517,7 @@ class Game extends Component {
             newEndName = this.state.selectedTile.charAt(0);
         }
         else newEndName = this.state.selectedTile.charAt(1);
-        if (yPos - 80 > 0) {
+        if (yPos - 80 > 0 && this.isFreeSpace(xPos, yPos - 80, xPos + 40, yPos)) {
             newEnds[index].name = newEndName;
             newEnds[index].xPos = xPos;
             newEnds[index].yPos = yPos;
@@ -525,20 +525,28 @@ class Game extends Component {
         else {
             newEnds.splice(index, 1);
         }
-        return newEnds;
+
+        this.setState({ ends: newEnds });
     }
 
     setEndDownSingle = (xPos, yPos, index) => {
         let newEnds = [...this.state.ends];
+
         let newEndName;
         if (newEnds[index].name === this.state.selectedTile.charAt(1)) {
             newEndName = this.state.selectedTile.charAt(0);
         }
         else newEndName = this.state.selectedTile.charAt(1);
-        newEnds[index].name = newEndName;
-        newEnds[index].yPos = yPos + 80;
-        newEnds[index].xPos = xPos;
-        return newEnds;
+        if (this.isFreeSpace(xPos, yPos + 80, xPos + 40, yPos + 160)) {
+            newEnds[index].name = newEndName;
+            newEnds[index].yPos = yPos + 80;
+            newEnds[index].xPos = xPos;
+        }
+        else {
+            newEnds.splice(index, 1);
+        }
+
+        this.setState({ ends: newEnds });
     }
 
     setEndRightSingle = (xPos, yPos, index) => {
@@ -548,10 +556,15 @@ class Game extends Component {
             newEndName = this.state.selectedTile.charAt(0);
         }
         else newEndName = this.state.selectedTile.charAt(1);
-        newEnds[index].name = newEndName;
-        newEnds[index].xPos = xPos + 80;
-        newEnds[index].yPos = yPos;
-        return newEnds;
+        if (this.isFreeSpace(xPos + 80, yPos, xPos + 160, yPos + 40)) {
+            newEnds[index].name = newEndName;
+            newEnds[index].xPos = xPos + 80;
+            newEnds[index].yPos = yPos;
+        }
+        else {
+            newEnds.splice(index, 1);
+        }
+        this.setState({ ends: newEnds });
     }
 
     setEndLeftSingle = (xPos, yPos, index) => {
@@ -561,7 +574,7 @@ class Game extends Component {
             newEndName = this.state.selectedTile.charAt(0);
         }
         else newEndName = this.state.selectedTile.charAt(1);
-        if (xPos - 80 > 0) {
+        if (xPos - 80 > 0 && this.isFreeSpace(xPos - 80, yPos, xPos, yPos + 40)) {
             newEnds[index].name = newEndName;
             newEnds[index].xPos = xPos;
             newEnds[index].yPos = yPos;
@@ -569,14 +582,14 @@ class Game extends Component {
         else {
             newEnds.splice(index, 1);
         }
-        return newEnds;
+        this.setState({ ends: newEnds });
     }
 
     setEndUpDouble = (xPos, yPos, index) => {
         let newEnds = [...this.state.ends];
         const newEndName = this.state.selectedTile.charAt(0);
         console.log(newEndName);
-        if (yPos - 80 > 0) {
+        if (yPos - 80 > 0 && this.isFreeSpace(xPos + 20, yPos - 80, xPos + 60, yPos)) {
             newEnds[index].xPos = xPos + 20;
             newEnds[index].yPos = yPos;
         }
@@ -597,20 +610,28 @@ class Game extends Component {
             yPos: yPos,
             direction: "left"
         };
-        newEnds.push(end1);
-        if (end2.xPos - 80 > 0) {
+
+        if (this.isFreeSpace(end1.xPos + 80, end1.yPos, end1.xPos + 160, end1.yPos + 40)) {
+            newEnds.push(end1);
+        }
+
+        if (end2.xPos - 80 > 0 && this.isFreeSpace(end2.xPos - 80, end2.yPos, end2.xPos, end2.yPos + 40)) {
             newEnds.push(end2);
         }
 
-        return newEnds;
+        this.setState({ ends: newEnds });
     }
 
     setEndDownDouble = (xPos, yPos, index) => {
         let newEnds = [...this.state.ends];
         const newEndName = this.state.selectedTile.charAt(0);
-        console.log(newEndName);
-        newEnds[index].xPos = xPos + 20;
-        newEnds[index].yPos = yPos + 40;
+        if (this.isFreeSpace(xPos + 20, yPos + 40, xPos + 60, yPos + 120)) {
+            newEnds[index].xPos = xPos + 20;
+            newEnds[index].yPos = yPos + 40;
+        }
+        else {
+            newEnds.splice(index, 1);
+        }
         const end1 = {
             name: newEndName,
             xPos: xPos + 80,
@@ -624,19 +645,26 @@ class Game extends Component {
             yPos: yPos,
             direction: "left"
         };
-        newEnds.push(end1);
-        if (end2.xPos - 80 > 0) {
+        if (this.isFreeSpace(end1.xPos, end1.yPos, end1.xPos + 80, end1.yPos + 40)) {
+            newEnds.push(end1);
+        }
+
+        if (end2.xPos - 80 > 0 && this.isFreeSpace(end2.xPos - 80, end2.yPos, end2.xPos, end2.yPos + 40)) {
             newEnds.push(end2);
         }
-        return newEnds;
+        this.setState({ ends: newEnds });
     }
 
     setEndRightDouble = (xPos, yPos, index) => {
         let newEnds = [...this.state.ends];
         const newEndName = this.state.selectedTile.charAt(0);
-        console.log(newEndName);
-        newEnds[index].xPos = xPos + 40;
-        newEnds[index].yPos = yPos + 20;
+        if (this.isFreeSpace(xPos + 40, yPos + 20, xPos + 120, yPos + 60)) {
+            newEnds[index].xPos = xPos + 40;
+            newEnds[index].yPos = yPos + 20;
+        }
+        else {
+            newEnds.splice(index, 1);
+        }
 
         const end1 = {
             name: newEndName,
@@ -651,19 +679,22 @@ class Game extends Component {
             yPos: yPos + 80,
             direction: "down"
         };
-       
-        if (end1.yPos - 80 > 0) {
+
+        if (end1.yPos - 80 > 0 && this.isFreeSpace(end1.xPos, end1.yPos - 80, end1.xPos + 40, end2.yPos)) {
             newEnds.push(end1);
         }
-        newEnds.push(end2);
-        return newEnds;
+        if (this.isFreeSpace(end2.xPos, end2.yPos, end2.xPos + 40, end2.yPos + 80)) {
+            newEnds.push(end2);
+        }
+
+        this.setState({ ends: newEnds });
     }
 
     setEndLeftDouble = (xPos, yPos, index) => {
         let newEnds = [...this.state.ends];
         const newEndName = this.state.selectedTile.charAt(0);
-        console.log(newEndName);
-        if (xPos - 80 > 0) {
+
+        if (xPos - 80 > 0 && (this.isFreeSpace(xPos - 80, yPos + 20, xPos, yPos + 60))) {
             newEnds[index].xPos = xPos;
             newEnds[index].yPos = yPos + 20;
         }
@@ -684,12 +715,66 @@ class Game extends Component {
             direction: "down"
         };
 
-        if (end1.yPos - 80 > 0) {
+        if (end1.yPos - 80 > 0 && this.isFreeSpace(end1.xPos, end1.yPos - 80, end1.xPos + 40, end1.yPos)) {
             newEnds.push(end1);
         }
-        newEnds.push(end2);
+        if (this.isFreeSpace(end2.xPos, end2.yPos, end2.xPos + 40, end2.yPos + 80)) {
+            newEnds.push(end2);
+        }
 
-        return newEnds;
+        this.setState({ ends: newEnds });
+    }
+
+    isFreeSpace = (xLT, yLT, xRB, yRB) => {
+        const playground = [...this.state.playgroundDeck];
+        let placeToCheck = {
+            xRb: 0,
+            xRT: 0,
+            yRB: 0,
+            yLB: 0
+        }
+
+        let result = true;
+        for (let i = 0; i < playground.length; i++) {
+            placeToCheck.xLT = playground[i].xPos;
+            placeToCheck.yLT = playground[i].yPos;
+            if (playground[i].classes === "Horizontal" ||
+                playground[i].classes === "HorizontalInverted") {
+                placeToCheck.xRB = Number(playground[i].xPos) + 80;
+                placeToCheck.xRT = Number(playground[i].xPos) + 80;
+                placeToCheck.yRB = Number(playground[i].yPos) + 40;
+                placeToCheck.yLB = Number(playground[i].yPos) + 40;
+            }
+            else {
+                placeToCheck.xRB = Number(playground[i].xPos) + 40;
+                placeToCheck.xRT = Number(playground[i].xPos) + 40;
+                placeToCheck.yRB = Number(playground[i].yPos) + 80;
+                placeToCheck.yLB = Number(playground[i].yPos) + 80;
+            }
+            if (
+                (placeToCheck.xRB >= xLT && placeToCheck.xRB <= xRB &&
+                    placeToCheck.yRB >= yLT && placeToCheck.yRB <= yRB) ||
+                (placeToCheck.xLT >= xLT && placeToCheck.xLT <= xRB &&
+                    placeToCheck.yLB >= yLT && placeToCheck.yLB <= yRB) ||
+                (placeToCheck.xLT >= xLT && placeToCheck.xLT <= xRB &&
+                    placeToCheck.yLT >= yLT && placeToCheck.yLT <= yRB) ||
+                (placeToCheck.xRT >> xLT && placeToCheck.xRT <= xRB &&
+                    placeToCheck.yLT >= yLT && placeToCheck.yLT <= yRB) ||
+                (xRB >= placeToCheck.xLT && xRB <= placeToCheck.xRB &&
+                    yRB >> placeToCheck.yLT && yRB <= placeToCheck.yRB) ||
+                (xLT >= placeToCheck.xLT && xLT <= placeToCheck.xRB &&
+                    yLT >= placeToCheck.yLT && yLT <= placeToCheck.yRB) ||
+                (xLT >= placeToCheck.xLT && xRB <= placeToCheck.xRB &&
+                    yLT <= placeToCheck.yLT && yRB >= placeToCheck.yRB) ||
+                (placeToCheck.xLT >= xLT && placeToCheck.xRB <= xRB &&
+                    placeToCheck.yLT <= yLT && placeToCheck.yRB >= yRB)
+            ) {
+                result = false;
+                break;
+            }
+        }
+
+        return result;
     }
 
     firstWordOfString = (str) => {
@@ -711,7 +796,7 @@ class Game extends Component {
                     time={this.state.time}
                     turns={this.state.turns}
                     average={this.state.average}
-                    drawFromStock={this.state.pullFromStock}
+                    drawFromStock={this.state.pulledFromDeck}
                     score={this.state.score} />
                 <Playground
                     board={this.state.playgroundDeck}
