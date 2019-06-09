@@ -21,7 +21,8 @@ class Game extends Component {
         selectedTile: "",    //for choosing tile
         states: [],            ///for prev/next. save PlayerDeck, time, turns, averageTime, score
         ends: [],          ///for saving ends tiles
-        possibleChoices: []
+        possibleChoices: [],
+        myTimer: 0
     }
 
     clickDeckHandler = () => {
@@ -369,13 +370,26 @@ class Game extends Component {
                 }
             }
         }
+        this.checkEndOfGame();
         this.setState({ isCanPullFromDeck: result });
     }
 
+    checkEndOfGame = () => {
+        if (this.state.deck.length === 0) {
+            clearInterval(this.state.myTimer);
+       }
+    }
+
     startTimer = () => {
+        let myNewTimer = setInterval(() => {
+            this.setState((prevState) => ({ time: prevState.time + 1 }));
+        }, 1000);
+        /*
         setInterval(() => {
             this.setState((prevState) => ({ time: prevState.time + 1 }));
         }, 1000);
+        */
+        this.setState({ myTimer: myNewTimer });
         setInterval(() => this.updateIfCanPullFromDeck(), 1000);
     }
 
