@@ -3,7 +3,7 @@ import Statistic from '../../components/Statistic/Statistic';
 import Playground from '../../components/Playground/Playground';
 import Deck from '../../components/Deck/Deck';
 import PlayerDeck from '../../components/PlayerDeck/PlayerDeck';
-import Header from '../../components/UI/Header/Header';
+import Header from '../../components/Header/Header';
 
 class Game extends Component {
     state = {
@@ -26,7 +26,8 @@ class Game extends Component {
         timerForPull: 0,
         timerForAvg: 0,
         displayButtons: false,
-        currentState: 0
+        currentState: 0,
+        winner: false
     }
 
     clickDeckHandler = () => {
@@ -361,10 +362,19 @@ class Game extends Component {
             clearInterval(this.state.myTimer);
             clearInterval(this.state.timerForPull);
             clearInterval(this.state.timerForAvg);
+            let winner;
+            if (this.state.score === 0) {
+                winner = true;
+            }
+            else {
+                winner = false;
+            }
+            this.saveState();
             this.setState({
                 isGameActive: false,
                 displayButtons: true,
-                currentState: this.state.states.length - 1
+                currentState: this.state.states.length - 1,
+                winner: winner
             });
         }
     }
@@ -381,13 +391,15 @@ class Game extends Component {
             timerForAvg: timer3
         });
 
-
     }
 
     updateAverageTime = () => {
         let avg = 0;
         if (this.state.turns > 0) {
             avg = this.state.time / this.state.turns;
+        }
+        else{
+            avg = this.state.time;
         }
         this.setState({ averageTime: avg });
     }
@@ -419,10 +431,8 @@ class Game extends Component {
         for (let i = 0; i < newPlayerValues.length; i++) {
             sum += Number(newPlayerValues[i]);
         }
-        
-        this.startTimer();
-        this.saveState();
 
+        this.startTimer();
         this.setState({
             deck: newDeck,
             playerDeck: newPlayerDeck,
@@ -441,6 +451,7 @@ class Game extends Component {
             possibleChoices: [],
             displayButtons: false
         });
+        this.saveState();
     }
 
     saveState = () => {
@@ -453,6 +464,7 @@ class Game extends Component {
         const pulledFromDeck = this.state.pulledFromDeck;
 
         let newStates = [...this.state.states];
+
         let newState = {
             playerDeck: playerDeck,
             playgroundDeck: playgroundDeck,
@@ -460,7 +472,7 @@ class Game extends Component {
             turns: turns,
             averageTime: averageTime,
             score: score,
-            pulledFromDeck: pulledFromDeck,
+            pulledFromDeck: pulledFromDeck
         };
 
         newStates.push(newState);
@@ -470,10 +482,10 @@ class Game extends Component {
     loadState = (index) => {
         const state = this.state.states[index];
         this.setState({
-            playerDeck : state.playerDeck,
+            playerDeck: state.playerDeck,
             time: state.time,
             turns: state.turns,
-            averageTime : state.averageTime,
+            averageTime: state.averageTime,
             score: state.score,
             pulledFromDeck: state.pulledFromDeck,
             playgroundDeck: state.playgroundDeck
@@ -738,7 +750,7 @@ class Game extends Component {
             direction: "down"
         };
 
-        if (end1.yPos - 80 > 0 && this.isFreeSpace(end1.xPos, end1.yPos - 80, end1.xPos + 40, end2.yPos)) {
+        if (yPos - 80 > 0 && this.isFreeSpace(xPos, yPos - 80, xPos + 40, yPos)) {
             newEnds.push(end1);
         }
         if (this.isFreeSpace(end2.xPos, end2.yPos, end2.xPos + 40, end2.yPos + 80)) {
@@ -855,9 +867,7 @@ class Game extends Component {
     }
 
     prevClickHandler = () => {
-        console.log("prev clicked");
-        console.log(this.state.currentState);
-        if(this.state.currentState > 0){
+        if (this.state.currentState > 0) {
             this.loadState(this.state.currentState - 1);
             this.setState(
                 (prevState) => ({ currentState: prevState.currentState - 1 })
@@ -866,9 +876,7 @@ class Game extends Component {
     }
 
     nextClickHandler = () => {
-        console.log("next clicked");
-        console.log(this.state.currentState);
-        if(this.state.currentState < this.state.states.length - 1){
+        if (this.state.currentState < this.state.states.length - 1) {
             this.loadState(this.state.currentState + 1);
             this.setState(
                 (prevState) => ({ currentState: prevState.currentState + 1 })
@@ -876,11 +884,31 @@ class Game extends Component {
         }
     }
 
+    undoHandler = () => {
+        if(this.state.states.length < 1){
+            return;
+        }
+        const state = this.state.states[this.state.states.length - 1];
+        const newStates = [...this.state.states];
+        newStates.pop();
+        this.setState((prevState) => ({
+            playerDeck: state.playerDeck,
+            turns: state.turns,
+            score: state.score,
+            pulledFromDeck: state.pulledFromDeck,
+            playgroundDeck: state.playgroundDeck,
+            states: newStates,
+            ends: [],
+            isCanPullFromDeck: false
+        }));
+    }
+
     render() {
         return (
             <Fragment>
                 <Header
-                    win={this.state.score}
+                    winner={this.state.winner}
+                    undo={this.undoHandler}
                     prevClickHandler={this.prevClickHandler}
                     nextClickHandler={this.nextClickHandler}
                     active={this.state.displayButtons}
