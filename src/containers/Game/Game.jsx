@@ -22,7 +22,9 @@ class Game extends Component {
         states: [],            ///for prev/next. save PlayerDeck, time, turns, averageTime, score
         ends: [],          ///for saving ends tiles
         possibleChoices: [],
-        myTimer: 0
+        myTimer: 0,
+        xPos: 100,
+        yPos: 100
     }
 
     clickDeckHandler = () => {
@@ -30,6 +32,7 @@ class Game extends Component {
             this.createGame();
             this.setState({ isGameActive: true });
             this.startTimer();
+            this.saveState();
         }
         else if (this.state.isCanPullFromDeck) {
             let newDeck = [...this.state.deck];
@@ -42,7 +45,7 @@ class Game extends Component {
 
             let newPlayerValues = this.setPlayerValues(newPlayerDeck);
             let newScore = this.setScore(newPlayerValues);
-
+            this.saveState();
             this.setState((prevState) => ({
                 selectedTile: "",
                 deck: newDeck,
@@ -70,6 +73,7 @@ class Game extends Component {
         if (!this.state.playgroundDeck.length) {
             this.firstClickPlayerTileHandler(newPlayerDeck, event.target.id, index);
             this.setPossibleChoices(event.target.id);
+            this.saveState();
         } else {
             this.setPossibleChoices(event.target.id);
             this.setState({ selectedTile: event.target.id });
@@ -377,18 +381,14 @@ class Game extends Component {
     checkEndOfGame = () => {
         if (this.state.deck.length === 0) {
             clearInterval(this.state.myTimer);
-       }
+            this.setState({isGameActive: false});
+        }
     }
 
     startTimer = () => {
         let myNewTimer = setInterval(() => {
             this.setState((prevState) => ({ time: prevState.time + 1 }));
         }, 1000);
-        /*
-        setInterval(() => {
-            this.setState((prevState) => ({ time: prevState.time + 1 }));
-        }, 1000);
-        */
         this.setState({ myTimer: myNewTimer });
         setInterval(() => this.updateIfCanPullFromDeck(), 1000);
     }
@@ -430,7 +430,13 @@ class Game extends Component {
         });
     }
 
-    saveState = (playerDeck, time, turns, averageTime, score) => {
+    saveState = () => {
+        const playerDeck = [...this.state.playerDeck];
+        const time = this.state.time;
+        const turns = this.state.turns;
+        const averageTime = this.state.averageTime;
+        const score = this.state.score;
+
         let newStates = [...this.state.states];
         let newState = {
             playerDeck: playerDeck,
@@ -512,7 +518,7 @@ class Game extends Component {
                 }
             }
         }
-
+        this.saveState();
         this.setState((prevState, props) => ({
             possibleChoices: [],
             playgroundDeck: newPlaygroundDeck,
