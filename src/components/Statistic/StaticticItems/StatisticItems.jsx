@@ -11,7 +11,7 @@ const statisticItems = (props) => {
             <div>Statistic</div>
             <StatisticItem value={updatedTime}>Time: </StatisticItem>
             <StatisticItem value={props.turns}>Turns: </StatisticItem>
-            <StatisticItem value={props.average}>Average Time: </StatisticItem>
+            <StatisticItem value={props.average.toFixed(2)}>Average Time: </StatisticItem>
             <StatisticItem value={props.drawFromStock}>Draw from stock: </StatisticItem>
             <StatisticItem value={props.score}>Score: </StatisticItem>
         </ul>

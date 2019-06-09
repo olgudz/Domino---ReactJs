@@ -6,7 +6,7 @@ const deck = (props) => (
         !props.isEmpty ?
                 <div className="Deck">
                         <Tile styles={""} click={props.clicked} />
-                </div> : null
+                </div> : <div className="Deck" />
 );
 
 export default deck;

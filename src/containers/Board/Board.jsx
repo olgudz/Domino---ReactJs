@@ -8,6 +8,7 @@ const board = (props) => {
     let tiles = [];
     let possibleChoices = [...props.possibleChoices];
     let choices = [];
+    const active = props.active;
 
     for (let i = 0; i < board.length; i++) {
         tiles[i] = 
@@ -19,18 +20,20 @@ const board = (props) => {
                 classes={board[i].classes}
             />;
     }
-    
-    for (let i = 0; i < possibleChoices.length; i++) {
-        choices[i] = 
-            <Placeholder
-                key={possibleChoices[i].name + "" + possibleChoices[i].direction} 
-                name = {possibleChoices[i].name}
-                xPos={possibleChoices[i].xPos}
-                yPos={possibleChoices[i].yPos}
-                classes={possibleChoices[i].classes}
-                click={props.click}
-            />;
+    if(active){
+        for (let i = 0; i < possibleChoices.length; i++) {
+            choices[i] = 
+                <Placeholder
+                    key={possibleChoices[i].name + "" + possibleChoices[i].classes + i} 
+                    name = {possibleChoices[i].name}
+                    xPos={possibleChoices[i].xPos}
+                    yPos={possibleChoices[i].yPos}
+                    classes={possibleChoices[i].classes}
+                    click={props.click}
+                />;
+        }      
     }
+    else choices = null;
     return (
         <div className="Board" >
             {tiles}

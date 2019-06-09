@@ -6,6 +6,7 @@ const playground = (props) => (
     <div className="Playground" >
         <Board
             board={props.board}
+            active={props.active}
             possibleChoices={props.possibleChoices}
             click={props.click}
         />
